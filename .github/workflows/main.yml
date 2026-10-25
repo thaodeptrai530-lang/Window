@@ -1,0 +1,34 @@
+name: Check-Windows-Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: windows-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check CPU, RAM, GPU and C Drive
+        shell: pwsh
+        run: |
+          Write-Host "===== CPU ====="
+          Get-CimInstance Win32_Processor |
+            Select-Object Name, NumberOfCores,
+              NumberOfLogicalProcessors
+
+          Write-Host "===== RAM ====="
+          Get-CimInstance Win32_ComputerSystem |
+            Select-Object TotalPhysicalMemory
+
+          Write-Host "===== C DRIVE ====="
+          Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'" |
+            Select-Object DeviceID, Size, FreeSpace
+
+          Write-Host "===== GPU ====="
+          Get-CimInstance Win32_VideoController |
+            Select-Object Name, DriverVersion
+
+          Write-Host "===== WINDOWS ====="
+          Get-CimInstance Win32_OperatingSystem |
+            Select-Object Caption, Version
